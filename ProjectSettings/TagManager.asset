@@ -7,6 +7,8 @@ TagManager:
   - Obstacle
   - Wall
   - golem
+  - SceneSwap
+  - Savepoint
   layers:
   - Default
   - TransparentFX

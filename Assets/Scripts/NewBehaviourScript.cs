@@ -10,9 +10,9 @@ public class NewBehaviourScript : MonoBehaviour
 
     private Rigidbody2D rb;
     private SpriteRenderer sr;
+    private Transform trans;
     public Animator animator;
     public BoxCollider2D box;
-    public GameManager gameManager;
 
 
     private bool facingRight = true;
@@ -24,6 +24,7 @@ public class NewBehaviourScript : MonoBehaviour
     public float MyAlphaValue = 10f;
     static private Color cVisible;
     static private Color cInvisible;
+
 
     private bool isGrounded;
     public Transform groundCheck;
@@ -53,14 +54,17 @@ public class NewBehaviourScript : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
+        trans = GetComponent<Transform>();
         animator = GetComponent<Animator>();
         box = GetComponent<BoxCollider2D>();
         extraJumps = extraJumpValue;
         horizontalAcceleration = horizontalAccelerationValue;
+        setSpawn();
 
         cVisible = new Color(sr.color.r, sr.color.g, sr.color.b, 1f);
         cInvisible = new Color(sr.color.r, sr.color.g, sr.color.b, MyAlphaValue);
     }
+
 
     // Update is called once per frame
     void FixedUpdate()
@@ -116,7 +120,7 @@ public class NewBehaviourScript : MonoBehaviour
             sr.color = cInvisible;
             Debug.Log("invisible");
             visible = false;
-            Invoke("GetVisible", invisibleTime);
+            Invoke("MakeVisible", invisibleTime);
         }
 
         groundRemember -= Time.deltaTime;
@@ -155,11 +159,13 @@ public class NewBehaviourScript : MonoBehaviour
         {
             animator.SetBool("Falling", true);
         }
+
+
+        //// SPÄTER ÄNDERN !!!!
         if (rb.position.y < -15f)
         {
-            gameManager.EndGame();
+            FindObjectOfType<GameManager>().EndGame();
         }
-
 
 
     }
@@ -171,22 +177,28 @@ public class NewBehaviourScript : MonoBehaviour
         transform.localScale = Scaler;
     }
 
-    void GetVisible()
+    void MakeVisible()
     {
         Debug.Log("visible");
         visible = true;
         sr.color = cVisible;
     }
 
-    private void OnTriggerStay2D(Collider2D collider){
-        //GetComponent<PlayerMovement>().enabled = false;
+    public bool getVisible()
+    {
+        return visible;
+    }
 
-        if (collider.tag == "golem" && visible)
+    void setSpawn()
+    {
+        if (FindObjectOfType<GameManager>().testActiveScene())
         {
-            Debug.Log("coli");
-            gameManager.EndGame();
+            Debug.Log("setSpawniftrue =  " + PlayerPrefs.GetString("scene") + "__" + PlayerPrefs.GetFloat("posX") + "__" + PlayerPrefs.GetFloat("posY"));
+            //trans.position.Set(PlayerPrefs.GetInt("posX"), PlayerPrefs.GetInt("posY"),0.5f);
+            Vector3 pos = new Vector3(PlayerPrefs.GetFloat("posX"), PlayerPrefs.GetFloat("posY"), 0.5f);
+            Quaternion rot = new Quaternion(0f, 0f, 0f, 0f);
+            trans.SetPositionAndRotation(pos, rot);
         }
-
     }
 
 }
